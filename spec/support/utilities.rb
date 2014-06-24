@@ -6,21 +6,19 @@ RSpec::Matchers.define :have_error_message do |message|
   end
 end
 
-def signin(user)
-  fill_in "Email",    with: user.email
-  fill_in "Password", with: user.password
-  click_button "Sign in"
-end
-
-RSpec::Matchers.define :land_on_profile_page_for_logged_in_user do |user|
-  match do |page|
-  	( expect(page).to have_title(user.name) ) &&
-      ( expect(page).to have_link('Profile',     href: user_path(user)) ) &&
-      ( expect(page).to have_link('Sign out',    href: signout_path) ) # &&
-      # ( expect(page).to_not have_link('Sign in', href: signin_path) )
+def signin( user, options = {} )
+	if options[:no_capybara]
+    # Sign in when not using Capybara.
+    remember_token = User.new_remember_token
+    cookies[:remember_token] = remember_token
+    user.update_attribute(:remember_token, User.digest(remember_token))
+  else
+	  visit signin_path
+    fill_in "Email",    with: user.email
+    fill_in "Password", with: user.password
+    click_button "Sign in"
   end
 end
-
 
 def submit_user_form
   click_button "Create my account"
