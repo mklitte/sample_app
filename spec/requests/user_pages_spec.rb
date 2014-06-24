@@ -15,49 +15,42 @@ describe "User pages" do
 
     before { visit signup_path }
 
-    let(:submit) { "Create my account" }
-
     describe "with invalid information" do
       it "should not create a user" do
-        expect { click_button submit }.not_to change(User, :count)
+        expect { submit_user_form }.not_to change(User, :count)
       end
       describe "after submit" do
-      	before { click_button submit }
+      	before { submit_user_form }
       	it { should have_title(full_title('Sign up')) }
       	it { should have_content("error") }
       end
     end
 
     describe "with valid information" do
-      let(:full_name) { "Example User" }	
-      let(:email) { "user@example.com" }
-      before do
-        fill_in "Name",         with: full_name
-        fill_in "Email",        with: email
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
-      end
+      let(:new_user_full_name) { "Example User" }
+      let(:new_user_email) { "user@example.com" }
+      before { fill_in_new_user_form(full_name: new_user_full_name, email: new_user_email) }
 
       it "should create a user" do
-        expect { click_button submit }.to change(User, :count).by(1)
+        expect { submit_user_form }.to change(User, :count).by(1)
       end
 
       describe "After submit" do
-      	before { click_button submit }
-        it { should have_title(full_title(full_name)) }
+      	before { submit_user_form }
+        it { should have_title(full_title(new_user_full_name)) }
         it { should have_content('Welcome to the Sample App!') }
       end
 
       describe "after saving the user" do
-        before { click_button submit }
-        let(:user) { User.find_by(email: email) }
+        before { submit_user_form }
+        let(:user) { User.find_by(email: new_user_email) }
         it { should have_link('Sign out') }
         it { should_not have_link('Sign in') }
         it { should have_title(user.name) }
         it { should have_selector('div.alert.alert-success', text: 'Welcome') }
 
         describe "followed by signout" do
-          before { click_link "Sign out" }
+          before { sign_out_user }
           it { should have_link('Sign in') }
           it { should_not have_link('Sign out') }
         end
