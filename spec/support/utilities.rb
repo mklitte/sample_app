@@ -25,13 +25,13 @@ def submit_user_form
 end
 
 def sign_out_user
-  click_link "Sign out"
+ 	click_link "Sign out"
 end
 
 def fill_in_new_user_form(params)
 	fill_in "Name",         with: params[:full_name]
   fill_in "Email",        with: params[:email]
   fill_in "Password",     with: "foobar"
-  fill_in "Confirmation", with: "foobar"
+  fill_in "Confirm Password", with: "foobar"
 end
 
