@@ -30,6 +30,44 @@ describe "StaticPages" do
           expect(page).to have_selector("li##{item.id}", text: item.content)
         end
       end
+
+      it "should display correct count of microposts" do
+        expect(page).to have_content( "#{user.microposts.count} " + "micropost".pluralize(user.microposts.count) )
+      end
+
+      describe "microposts feed" do
+        before do
+          50.times do
+            FactoryGirl.create(:micropost, user: user, content: "Lirum Larum")
+          end
+          visit root_path
+        end
+        it "should be paginated" do
+          expect(page).to have_selector('div.pagination')
+          expect(page).to have_selector('ol li', count: 30)
+        end
+
+        describe "deletion of micropost" do 
+          let(:wrong_user) { FactoryGirl.create(:user, email: "wrong@example.com") }            
+          before do    
+            FactoryGirl.create(:micropost, user: user, content: "Hokus Pokus")
+            FactoryGirl.create(:micropost, user: wrong_user, content: "Pokus Hokus")
+            visit root_path
+          end       
+          it "should be possible only for posts created by oneself" do
+                      pending "Activate this test when user following has been implemented. Remember to add user association to test code"
+            expect(page).to have_selector("ol li span.user", :text => user.name)        # check that page has microposts from both the user
+            expect(page).to have_selector("ol li span.user", :text => wrong_user.name)  # and the wrong user          
+            page.all("ol li").each do |feeditem|
+              if feeditem.find("span.user a").text == user.name
+                expect(feeditem).to have_selector("a", :text => "delete")
+              else
+                expect(feeditem).not_to have_selector("a", :text => "delete")
+              end
+            end
+          end
+        end
+      end
     end    
   end
 
