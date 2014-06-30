@@ -35,6 +35,17 @@ describe "StaticPages" do
         expect(page).to have_content( "#{user.microposts.count} " + "micropost".pluralize(user.microposts.count) )
       end
 
+      describe "follower/following counts" do
+        let(:other_user) { FactoryGirl.create(:user) }
+        before do
+          other_user.follow!(user)
+          visit root_path
+        end
+
+        it { should have_link("0 following", href: following_user_path(user)) }
+        it { should have_link("1 followers", href: followers_user_path(user)) }
+      end
+      
       describe "microposts feed" do
         before do
           50.times do
