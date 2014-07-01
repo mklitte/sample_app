@@ -167,6 +167,55 @@ describe "User pages" do
           it { should have_xpath("//input[@value='Follow']") }
         end
       end
+    end
+
+    describe "displaying the number of followed users" do 
+      let(:other_user) { FactoryGirl.create(:user) }
+      before do
+        signin user
+      end
+      describe "when following noone" do
+        it { should have_link("0 following", href: following_user_path(user))}
+      end
+      describe "after adding one" do
+        before do
+          user.follow!(other_user)
+          visit user_path(user)
+        end
+        it { should have_link("1 following", href: following_user_path(user)) }
+        describe "and deleting one" do
+          before do
+            user.unfollow!(other_user)
+            visit user_path(user)
+          end
+          it { should have_link("0 following", href: following_user_path(user)) }
+        end
+      end
+    end    
+
+    describe "displaying the number of following users" do 
+      let(:other_user) { FactoryGirl.create(:user) }
+      before do
+        signin user
+        visit user_path(other_user)
+      end
+      describe "when has no followers" do
+        it { should have_link("0 followers", href: followers_user_path(other_user))}
+      end
+      describe "after adding one" do
+        before do
+          user.follow!(other_user)
+          visit user_path(other_user)
+        end
+        it { should have_link("1 followers", href: followers_user_path(other_user)) }
+        describe "and deleting one" do
+          before do
+            user.unfollow!(other_user)
+            visit user_path(other_user)
+          end
+          it { should have_link("0 followers", href: followers_user_path(other_user)) }
+        end
+      end
     end    
   end
 

@@ -63,10 +63,10 @@ describe "StaticPages" do
           before do    
             FactoryGirl.create(:micropost, user: user, content: "Hokus Pokus")
             FactoryGirl.create(:micropost, user: wrong_user, content: "Pokus Hokus")
+            user.follow!(wrong_user)
             visit root_path
           end       
           it "should be possible only for posts created by oneself" do
-                      pending "Activate this test when user following has been implemented. Remember to add user association to test code"
             expect(page).to have_selector("ol li span.user", :text => user.name)        # check that page has microposts from both the user
             expect(page).to have_selector("ol li span.user", :text => wrong_user.name)  # and the wrong user          
             page.all("ol li").each do |feeditem|
